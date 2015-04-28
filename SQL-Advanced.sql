@@ -75,3 +75,51 @@ ORDER BY d.Name
 
 -- 11 Write a SQL query to find all managers that have exactly 5 employees. Display their first name and last name.
 
+SELECT m.EmployeeID AS [ManagerID], CONCAT(m.FirstName, ' ', m.LastName) AS [Manager Name], COUNT(m.EmployeeID)
+FROM Employees m
+INNER JOIN Employees e ON e.ManagerID = m.EmployeeID
+GROUP BY m.EmployeeID, m.FirstName, m.LastName
+HAVING COUNT(m.EmployeeID) = 5
+
+-- 12 Write a SQL query to find all employees along with their managers. For employees that do not have manager display the value "(no manager)"
+
+SELECT CONCAT(e.FirstName, ' ', e.LastName) AS [Employee Name],
+ISNULL(m.FirstName + ' ' + m.LastName, '(no manager)') AS [Manager Name]
+FROM Employees e
+LEFT JOIN Employees m ON e.ManagerID = m.EmployeeID
+
+-- 13 Write a SQL query to find the names of all employees whose last name is exactly 5 characters long. Use the built-in LEN(str) function.
+
+SELECT CONCAT(FirstName, ' ', MiddleName, ' ', LastName) AS [Full Name]
+FROM Employees
+WHERE LEN(LastName) = 5
+
+-- 14 Write a SQL query to display the current date and time in the following format "day.month.year hour:minutes:seconds:milliseconds". Search in  Google to find how to format dates in SQL Server.
+
+SELECT FORMAT(GETDATE(), 'dd.MM.yyyy HH:mm:ss:fff')
+
+-- 15 Write a SQL statement to create a table Users. Users should have username,
+-- password, full name and last login time. Choose appropriate data types for the 
+-- table fields. Define a primary key column with a primary key constraint.
+-- Define the primary key column as identity to facilitate inserting records. 
+-- Define unique constraint to avoid repeating usernames. 
+-- Define a check constraint to ensure the password is at least 5 characters long.
+
+CREATE TABLE Users (
+    UserId Int IDENTITY,
+    Username nvarchar(10) NOT NULL,
+    Password nvarchar(20) NOT NULL CHECK (LEN(Password) > 5),
+    FullName nvarchar(50) NOT NULL,
+    LastLoginTime DATETIME,
+    CONSTRAINT PK_Users PRIMARY KEY(UserId),
+    CONSTRAINT UQ_Username UNIQUE(Username),
+) 
+GO
+
+-- 16 Write a SQL statement to create a view that displays the users from the Users table that have been in the system today. Test if the view works correctly.
+
+CREATE VIEW [Users logged in today] AS
+SELECT Username
+FROM Users
+WHERE DATEDIFF(day, LastLoginTime, GETDATE()) = 0
+
