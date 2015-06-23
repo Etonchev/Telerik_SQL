@@ -89,18 +89,18 @@ WHERE e.AddressID = a.AddressID
 -- 20 Write a SQL query to find all employees along with their manager.
 
 SELECT CONCAT(e.FirstName, ' ', e.LastName) AS 'Employee', e.ManagerID,
-CONCAT(m.FirstName, ' ', m.LastName) AS 'Manager'
+ISNULL (m.FirstName + ' ' + m.LastName, 'No Manager') AS Manager
 FROM Employees e
-JOIN Employees m ON e.ManagerID = m.ManagerID
+LEFT JOIN Employees m ON e.ManagerID = m.EmployeeID
 
 -- 21 Write a SQL query to find all employees, along with their manager and their address. Join the 3 tables: Employees e, Employees m and Addresses a.
 
-SELECT CONCAT(e.FirstName, ' ', e.LastName) AS 'Employee', e.ManagerID,
-CONCAT(m.FirstName, ' ', m.LastName) AS 'Manager',
-AddressText AS 'Employee Address'
+SELECT CONCAT(e.FirstName, ' ', e.LastName) AS Employee,
+ISNULL (m.FirstName + ' ' + m.LastName, 'No Manager') AS Manager,
+a.AddressText AS Address
 FROM Employees e
-JOIN Employees m ON e.ManagerID = m.ManagerID
-JOIN Addresses a ON e.AddressID = a.AddressID
+LEFT JOIN Employees m ON e.ManagerID = m.EmployeeID
+INNER JOIN Addresses a ON e.AddressID = a.AddressID
 
 -- 22 Write a SQL query to find all departments and all town names as a single list. Use UNION.
 
@@ -119,7 +119,8 @@ RIGHT JOIN Employees e ON e.ManagerID = m.EmployeeID
 
 -- 24 Write a SQL query to find the names of all employees from the departments "Sales" and "Finance" whose hire year is between 1995 and 2005.
 
-SELECT CONCAT(e.FirstName, ' ', e.LastName, ' - ', d.Name, ', [', DatePart(YEAR, e.HireDate), ']')
-FROM Employees e 
-JOIN Departments d ON e.DepartmentID = d.DepartmentID   
-WHERE d.Name IN ('Sales', 'Finance') AND DATEPART(YEAR, e.HireDate) BETWEEN 1995 AND 2005
+SELECT CONCAT(e.FirstName, ' ', e.LastName) AS Employee,
+DATEPART(yy, e.HireDate) AS [Hire year]
+FROM Employees e
+INNER JOIN Departments d ON e.DepartmentID = d.DepartmentID
+WHERE d.Name = 'Sales' AND DATEPART(yy, e.HireDate) BETWEEN 1995 AND 2005

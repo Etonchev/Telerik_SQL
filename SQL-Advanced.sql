@@ -65,7 +65,7 @@ ORDER BY AVG(e.Salary)
 
 -- 10 Write a SQL query to find the count of all employees in each department and for each town.
 
-SELECT t.Name, d.Name, COUNT(*) AS [Number of Employees]
+SELECT t.Name AS [Town], d.Name as [Department], COUNT(*) AS [Number of Employees]
 FROM Employees e
 INNER JOIN Departments d ON e.DepartmentID = d.DepartmentID
 INNER JOIN Addresses a ON e.AddressID = a.AddressID
@@ -75,11 +75,11 @@ ORDER BY d.Name
 
 -- 11 Write a SQL query to find all managers that have exactly 5 employees. Display their first name and last name.
 
-SELECT m.EmployeeID AS [ManagerID], CONCAT(m.FirstName, ' ', m.LastName) AS [Manager Name], COUNT(m.EmployeeID)
-FROM Employees m
-INNER JOIN Employees e ON e.ManagerID = m.EmployeeID
-GROUP BY m.EmployeeID, m.FirstName, m.LastName
-HAVING COUNT(m.EmployeeID) = 5
+SELECT m.FirstName, m.LastName
+FROM Employees e
+JOIN Employees m ON e.ManagerID = m.EmployeeID
+GROUP BY m.FirstName, m.LastName
+HAVING COUNT(e.ManagerID) = 5
 
 -- 12 Write a SQL query to find all employees along with their managers. For employees that do not have manager display the value "(no manager)"
 
@@ -108,12 +108,18 @@ SELECT FORMAT(GETDATE(), 'dd.MM.yyyy HH:mm:ss:fff')
 CREATE TABLE Users (
     UserId Int IDENTITY,
     Username nvarchar(10) NOT NULL,
-    Password nvarchar(20) NOT NULL CHECK (LEN(Password) > 5),
+    Password nvarchar(20) NOT NULL,
     FullName nvarchar(50) NOT NULL,
     LastLoginTime DATETIME,
     CONSTRAINT PK_Users PRIMARY KEY(UserId),
     CONSTRAINT UQ_Username UNIQUE(Username),
+	CONSTRAINT LEN_Password CHECK (LEN(Password) > 5)
 ) 
+
+INSERT INTO Users2(Username, Fullname, UserPassword, LastLoginTime)
+VALUES ('eTonchev', 'Emil Tonchev', 'parola', GETDATE()),
+('pIvanov', 'Pavel Ivanov', 'asd', GETDATE() - 2)
+
 GO
 
 -- 16 Write a SQL statement to create a view that displays the users from the Users table that have been in the system today. Test if the view works correctly.
@@ -123,3 +129,13 @@ SELECT Username
 FROM Users
 WHERE DATEDIFF(day, LastLoginTime, GETDATE()) = 0
 
+-- 17 Write a SQL statement to create a table Groups. Groups should have unique name (use unique constraint). Define primary key and identity column.
+
+CREATE TABLE Groups(
+GroupID int IDENTITY,
+Name nvarchar(15) NOT NULL,
+CONSTRAINT PK_Group PRIMARY KEY(GroupID),
+CONSTRAINT UQ_Group UNIQUE(Name)
+)
+
+-- 18 Write a SQL statement to add a column GroupID to the table Users. Fill some data in this new column and as well in the Groups table. Write a SQL statement to add a foreign key constraint between tables Users and Groups tables.
